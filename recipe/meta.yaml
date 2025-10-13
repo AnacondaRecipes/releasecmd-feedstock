@@ -12,35 +12,43 @@ source:
 
 build:
   number: 0
-  noarch: python
-  script: {{ PYTHON }} -m pip install . -vv
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  skip: true  # [py<38]
 
 requirements:
   host:
     - pip
-    - python >=3.5
-    - setuptools >=38.3.0
+    - python
+    - setuptools >=64
+    - setuptools_scm >=8
   run:
-    - python >=3.5
-    - setuptools >=38.3.0
-    - twine
+    - python
     - packaging
+    - setuptools
+    - twine
 
 test:
   imports:
     - releasecmd
   commands:
     - pip check
+    - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
   requires:
     - pip
 
 about:
   home: https://github.com/thombashi/releasecmd
   summary: releasecmd is a release subcommand for setup.py (setuptools.setup). the subcommand create a git tag and push, and upload packages to PyPI.
-  dev_url: https://github.com/thombashi/releasecmd
+  description: releasecmd is a release subcommand for setup.py (setuptools.setup). the subcommand create a git tag and push, and upload packages to PyPI.
   license: MIT
+  license_family: MIT
   license_file: LICENSE
+  dev_url: https://github.com/thombashi/releasecmd
+  doc_url: https://github.com/thombashi/releasecmd/blob/master/README.rst
 
 extra:
   recipe-maintainers:
     - basnijholt
+  skip-lints:
+    # https://inspector.pypi.io/project/releasecmd/0.10.4/packages/bd/a1/7d9b457e2ee995ec08cad3a75e39a006c94f03325b33a77416bd0f6652a6/releasecmd-0.10.4.tar.gz/releasecmd-0.10.4/setup.py#line.57
+    - python_build_tool_in_run
